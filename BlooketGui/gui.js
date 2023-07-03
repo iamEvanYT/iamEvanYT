@@ -452,6 +452,7 @@
     }
     const Cheats = {
         global: [
+            // Auto Answer (Toggle and One-Off)
             {
                 name: "Auto Answer (Toggle)",
                 description: "Toggles auto answer on",
@@ -478,6 +479,60 @@
                 }
             },
             {
+                name: "Auto Answer",
+                description: "Click the correct answer for you",
+                run: function () {
+                    const { stateNode: { state: { question, stage, feedback }, props: { client: { question: pquestion } } } } = Object.values(document.querySelector('body div[id] > div > div'))[1].children[0]._owner;
+                    try {
+                        if (question.qType != "typing") if (stage !== "feedback" && !feedback) [...document.querySelectorAll(`[class*="answerContainer"]`)][(question || pquestion).answers.map((x, i) => (question || pquestion).correctAnswers.includes(x) ? i : null).filter(x => x != null)[0]]?.click?.();
+                        else document.querySelector('[class*="feedback"]')?.firstChild?.click?.();
+                        else Object.values(document.querySelector("[class*='typingAnswerWrapper']"))[1].children._owner.stateNode.sendAnswer(question.answers[0])
+                    } catch { }
+                }
+            },
+            // Whisper Answers (Toggle and One-Off)
+            {
+                name: "Whisper Answers (Toggle)",
+                description: "Toggles whisper answers on",
+                type: "toggle",
+                enabled: false,
+                data: null,
+                run: function () {
+                    if (!this.enabled) {
+                        this.enabled = true;
+                        this.data = setInterval(() => {
+                            questionWindow = document.querySelector("#app>div>div");
+                            isQuestionVisible = (Object.values(questionWindow)[1].children[0]._owner.stateNode.state.stage=="question")
+                            if (isQuestionVisible) {
+                                correctAns = Object.values(questionWindow)[1].children[0]._owner.stateNode.state.question.correctAnswers[0];
+                                ansArray = Object.values(questionWindow)[1].children[0]._owner.stateNode.state.question.answers;
+                                ansIndex = ansArray.indexOf(correctAns);
+                                document.getElementsByClassName("styles__playerEnergy___G4cGN-camelCase")[0].innerHTML=ansIndex+1;
+                            }
+                        }, 50);
+                    } else {
+                        this.enabled = false;
+                        clearInterval(this.data);
+                        this.data = null;
+                    }
+                }
+            },
+            {
+                name: "Whisper Answer",
+                description: "Show you the correct answer instaed of how much money/gold you have",
+                run: function () {
+                    questionWindow = document.querySelector("#app>div>div");
+                    isQuestionVisible = (Object.values(questionWindow)[1].children[0]._owner.stateNode.state.stage=="question")
+                    if (isQuestionVisible) {
+                        correctAns = Object.values(questionWindow)[1].children[0]._owner.stateNode.state.question.correctAnswers[0];
+                        ansArray = Object.values(questionWindow)[1].children[0]._owner.stateNode.state.question.answers;
+                        ansIndex = ansArray.indexOf(correctAns);
+                        document.getElementsByClassName("styles__playerEnergy___G4cGN-camelCase")[0].innerHTML=ansIndex+1;
+                    }
+                }
+            },
+            // Highlight Answers (Toggle and One-Off)
+            {  
                 name: "Highlight Answers (Toggle)",
                 description: "Toggles highlight answers on",
                 type: "toggle",
@@ -500,6 +555,18 @@
                     }
                 }
             },
+            {  
+                name: "Highlight Answer",
+                description: "Highlight answer for this question",
+                run: function () {
+                    const { stateNode: { state, props } } = Object.values(document.querySelector('body div[id] > div > div'))[1].children[0]._owner;
+                    [...document.querySelectorAll(`[class*="answerContainer"]`)].forEach((answer, i) => {
+                        if ((state.question || props.client.question).correctAnswers.includes((state.question || props.client.question).answers[i])) answer.style.backgroundColor = "rgb(0, 207, 119)";
+                        else answer.style.backgroundColor = "rgb(189, 15, 38)";
+                    });
+                }
+            },
+            // Auto Sell Dupes On Open
             {
                 name: "Auto Sell Dupes On Open",
                 description: "Sells the blook you unlock when you open a pack if you already have one (Doesn't sell Legendaries or rarer)",
@@ -534,18 +601,6 @@
                         this.enabled = false;
                         window.fetch = this.data;
                     }
-                }
-            },
-            {
-                name: "Auto Answer",
-                description: "Click the correct answer for you",
-                run: function () {
-                    const { stateNode: { state: { question, stage, feedback }, props: { client: { question: pquestion } } } } = Object.values(document.querySelector('body div[id] > div > div'))[1].children[0]._owner;
-                    try {
-                        if (question.qType != "typing") if (stage !== "feedback" && !feedback) [...document.querySelectorAll(`[class*="answerContainer"]`)][(question || pquestion).answers.map((x, i) => (question || pquestion).correctAnswers.includes(x) ? i : null).filter(x => x != null)[0]]?.click?.();
-                        else document.querySelector('[class*="feedback"]')?.firstChild?.click?.();
-                        else Object.values(document.querySelector("[class*='typingAnswerWrapper']"))[1].children._owner.stateNode.sendAnswer(question.answers[0])
-                    } catch { }
                 }
             },
             {
@@ -2543,7 +2598,38 @@
                         alert(`Reset ${count} players' gold!`);
                     });
                 }
-            }
+            },
+            {
+                name: "Set All Players' Gold",
+                description: "Sets amount of gold",
+                inputs: [{
+                    name: "Gold",
+                    type: "number"
+                }],
+                run: function (gold) {
+                    let i = document.createElement('iframe');
+                    document.body.append(i);
+                    window.alert = i.contentWindow.alert.bind(window);
+                    i.remove();
+                    let { stateNode: { props, state } } = Object.values(document.querySelector('body div[id] > div > div'))[1].children[0]._owner;
+                    let count = 0;
+                    props.liveGameController.getDatabaseVal("c", async (players) => {
+                        if (players) for (const player of Object.keys(players)) {
+                            props.liveGameController.setVal({
+                                path: "c/".concat(props.client.name),
+                                val: {
+                                    b: props.client.blook,
+                                    g: state.gold,
+                                    tat: `${player}:swap:${gold}`
+                                }
+                            });
+                            count++;
+                            await new Promise(r => setTimeout(r, 4000));
+                        };
+                        alert(`Reset ${count} players' gold!`);
+                    });
+                }
+            },
         ],
         kingdom: [
             {
