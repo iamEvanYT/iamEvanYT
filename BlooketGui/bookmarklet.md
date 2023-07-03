@@ -1,0 +1,2 @@
+# Projcet Blooket
+`javascript:(function()%7Bconst githubUrl %3D "https%3A%2F%2Fraw.githubusercontent.com%2FiamEvanYT%2FiamEvanYT%2Fmain%2FBlooketGui%2Fgui.js"%3B%0A%0Afetch(githubUrl)%0A    .then(response %3D> response.text())%0A    .then(data %3D> %7B%0A        eval(data)%3B%0A    %7D)%0A    .catch(error %3D> %7B%0A        console.error("Error loading JavaScript file%3A"%2C error)%3B%0A    %7D)%3B%7D)()%3B`
