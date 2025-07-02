@@ -19,7 +19,7 @@ Time Period: March 2025 - Present
 
 Time Period: July 2023 - Present
 
-This Roblox game is based on the popular [Skibidi Toilet](https://en.wikipedia.org/wiki/Skibidi_Toilet) meme at the time. It reached 5 billion visits and peaked around 400,000 players at the time.
+This Roblox game is based on the popular [Skibidi Toilet](https://en.wikipedia.org/wiki/Skibidi_Toilet) meme at the time. It reached 5 billion visits and peaked around 400,000 concurrent players at the time.
 
 - [Game](https://www.roblox.com/games/13775256536/)
 - [Website](https://toilettowerdefense.com/)
